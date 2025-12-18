@@ -15,34 +15,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2) 安装 Qt6（含 QtTest + QtSql + SQLite 驱动）
-      # 说明：aqtinstall 会从官方渠道下载对应的 Qt 组件，适合在 CI 上使用。
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: "6.6.3"
-          host: "linux"
-          target: "desktop"
-          arch: "gcc_64"
-          modules: "qtsql"
-
-      # 3) 安装构建工具与覆盖率工具
-      - name: Install build tools
+      # 2) 安装 Qt（APT 方式更稳定：不依赖 Qt 官方下载 / CDN / 速率限制）
+      # 说明：只要能构建/运行 QtTest + QtSql(QSQLITE) 即可，不要求 CI 上与本地 Qt 版本完全一致。
+      - name: Install build tools & Qt
         run: |
           sudo apt-get update
-          sudo apt-get install -y make g++ gcovr
+          sudo apt-get install -y \
+            build-essential make gcovr \
+            qt6-base-dev qt6-base-dev-tools \
+            qt6-tools-dev qt6-tools-dev-tools \
+            libqt6sql6-sqlite
 
-      # 4) 构建并运行单元测试（QtTest）
+      # 3) 构建并运行单元测试（QtTest）
       - name: Build & run QtTest
         working-directory: Lab4/project/tests
         run: |
           mkdir -p build
           cd build
-          qmake "CONFIG+=coverage" ../LedgerAppTests.pro
+          QMAKE_BIN="$(command -v qmake6 || command -v qmake)"
+          echo "Using qmake: $QMAKE_BIN"
+          "$QMAKE_BIN" "CONFIG+=coverage" ../LedgerAppTests.pro
           make -j2
           QT_QPA_PLATFORM=offscreen ./LedgerAppTests -maxwarnings 0
 
-      # 5) 生成覆盖率报告（基于 gcov）
+      # 4) 生成覆盖率报告（基于 gcov）
       - name: Coverage (gcovr)
         working-directory: Lab4/project/tests
         run: |
@@ -51,7 +47,7 @@ jobs:
             --exclude "../../.qtcreator" --exclude "../build" \
             --print-summary --xml-pretty -o ../coverage.xml
 
-      # 6) 上传覆盖率产物（便于下载查看，也方便截图）
+      # 5) 上传覆盖率产物（便于下载查看，也方便截图）
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
