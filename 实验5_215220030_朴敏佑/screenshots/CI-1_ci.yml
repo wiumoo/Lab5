@@ -75,9 +75,9 @@ jobs:
           if [ ! -f ../coverage.xml ]; then
             echo "coverage.xml missing; creating minimal stub.";
             cat > ../coverage.xml <<'XML'
-            <?xml version=\"1.0\"?>
-            <coverage line-rate=\"0\" branch-rate=\"0\" version=\"0\" timestamp=\"0\"></coverage>
-            XML
+          <?xml version=\"1.0\"?>
+          <coverage line-rate=\"0\" branch-rate=\"0\" version=\"0\" timestamp=\"0\"></coverage>
+          XML
           fi
 
           exit 0
