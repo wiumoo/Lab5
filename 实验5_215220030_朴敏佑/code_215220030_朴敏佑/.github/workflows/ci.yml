@@ -35,8 +35,13 @@ jobs:
           mkdir -p build
           cd build
           export QT_SELECT=qt5
-          echo "Using qmake: $(command -v qmake)"
-          qmake "CONFIG+=coverage" "QMAKE_CC=gcc-12" "QMAKE_CXX=g++-12" ../LedgerAppTests.pro
+          QMAKE_BIN="/usr/lib/qt5/bin/qmake"
+          if [ ! -x "$QMAKE_BIN" ]; then
+            QMAKE_BIN="$(command -v qmake)"
+          fi
+          echo "Using qmake: $QMAKE_BIN"
+          "$QMAKE_BIN" -v || true
+          "$QMAKE_BIN" "CONFIG+=coverage" "QMAKE_CC=gcc-12" "QMAKE_CXX=g++-12" ../LedgerAppTests.pro
           make -j2
           QT_QPA_PLATFORM=offscreen ./LedgerAppTests -maxwarnings 0
 
