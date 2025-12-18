@@ -15,16 +15,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2) 安装 Qt（APT 方式更稳定：不依赖 Qt 官方下载 / CDN / 速率限制）
-      # 说明：只要能构建/运行 QtTest + QtSql(QSQLITE) 即可，不要求 CI 上与本地 Qt 版本完全一致。
+      # 2) 安装 Qt（使用 Ubuntu APT + Qt5：更稳，避免 Qt6 在 runner 上出现符号不匹配/链接失败）
+      # 说明：本项目未依赖 Qt6-only API；Qt5 能满足 QtTest + QtSql(QSQLITE)。
       - name: Install build tools & Qt
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             build-essential make gcovr \
-            qt6-base-dev qt6-base-dev-tools \
-            qt6-tools-dev qt6-tools-dev-tools \
-            libqt6sql6-sqlite
+            qtbase5-dev qtbase5-dev-tools qt5-qmake qtchooser \
+            qttools5-dev-tools \
+            libqt5sql5-sqlite \
+            libgl1-mesa-dev
 
       # 3) 构建并运行单元测试（QtTest）
       - name: Build & run QtTest
@@ -32,9 +33,9 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          QMAKE_BIN="$(command -v qmake6 || command -v qmake)"
-          echo "Using qmake: $QMAKE_BIN"
-          "$QMAKE_BIN" "CONFIG+=coverage" ../LedgerAppTests.pro
+          export QT_SELECT=qt5
+          echo "Using qmake: $(command -v qmake)"
+          qmake "CONFIG+=coverage" ../LedgerAppTests.pro
           make -j2
           QT_QPA_PLATFORM=offscreen ./LedgerAppTests -maxwarnings 0
 
