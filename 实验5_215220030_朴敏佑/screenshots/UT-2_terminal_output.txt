@@ -1,0 +1,80 @@
+********* Start testing of DatabaseTests *********
+Config: Using QtTest library 5.12.8, Qt 5.12.8 (x86_64-little_endian-lp64 shared (dynamic) release build; by GCC 9.3.0)
+PASS   : DatabaseTests::initTestCase()
+QDEBUG : DatabaseTests::db_init_default_usesCwdLedgerDb() Database path: "/tmp/LedgerAppTests-AsfIQM/ledger.db"
+PASS   : DatabaseTests::db_init_default_usesCwdLedgerDb()
+QDEBUG : DatabaseTests::db_init_invalidPath_fails() Database path: "/tmp/this/path/should/not/exist_12345/ledger.db"
+QSYSTEM: DatabaseTests::db_init_invalidPath_fails() Database connection failed: "unable to open database file Error opening database"
+PASS   : DatabaseTests::db_init_invalidPath_fails()
+QDEBUG : DatabaseTests::account_addAccount_setsId() Database path: "/tmp/LedgerAppTests-flYhzP/test_ledger.db"
+PASS   : DatabaseTests::account_addAccount_setsId()
+QDEBUG : DatabaseTests::account_addAccount_duplicateName_fails() Database path: "/tmp/LedgerAppTests-KxeGGT/test_ledger.db"
+QSYSTEM: DatabaseTests::account_addAccount_duplicateName_fails() Failed to add account: "UNIQUE constraint failed: accounts.name Unable to fetch row"
+PASS   : DatabaseTests::account_addAccount_duplicateName_fails()
+QDEBUG : DatabaseTests::account_getAllAccounts_returnsInserted() Database path: "/tmp/LedgerAppTests-RCjwJr/test_ledger.db"
+PASS   : DatabaseTests::account_getAllAccounts_returnsInserted()
+QDEBUG : DatabaseTests::account_updateAccount_updatesFields() Database path: "/tmp/LedgerAppTests-XwUnIX/test_ledger.db"
+PASS   : DatabaseTests::account_updateAccount_updatesFields()
+QDEBUG : DatabaseTests::account_updateAccount_duplicateName_fails() Database path: "/tmp/LedgerAppTests-nNylmp/test_ledger.db"
+QSYSTEM: DatabaseTests::account_updateAccount_duplicateName_fails() Failed to update account: "UNIQUE constraint failed: accounts.name Unable to fetch row"
+PASS   : DatabaseTests::account_updateAccount_duplicateName_fails()
+QDEBUG : DatabaseTests::account_updateBalance_increases() Database path: "/tmp/LedgerAppTests-KZsbjG/test_ledger.db"
+PASS   : DatabaseTests::account_updateBalance_increases()
+QDEBUG : DatabaseTests::account_updateBalance_decreases() Database path: "/tmp/LedgerAppTests-yKRVRC/test_ledger.db"
+PASS   : DatabaseTests::account_updateBalance_decreases()
+QDEBUG : DatabaseTests::account_updateBalance_nonexistentId_fails() Database path: "/tmp/LedgerAppTests-MMgCqo/test_ledger.db"
+PASS   : DatabaseTests::account_updateBalance_nonexistentId_fails()
+QWARN  : DatabaseTests::account_updateBalance_withoutInit_fails() QSqlQuery::prepare: database not open
+QSYSTEM: DatabaseTests::account_updateBalance_withoutInit_fails() Failed to update balance: "Driver not loaded Driver not loaded"
+PASS   : DatabaseTests::account_updateBalance_withoutInit_fails()
+QDEBUG : DatabaseTests::account_balance_matchesAfterTransaction_income() Database path: "/tmp/LedgerAppTests-gAblQy/test_ledger.db"
+PASS   : DatabaseTests::account_balance_matchesAfterTransaction_income()
+QDEBUG : DatabaseTests::account_balance_matchesAfterTransaction_expense() Database path: "/tmp/LedgerAppTests-XUDaUq/test_ledger.db"
+PASS   : DatabaseTests::account_balance_matchesAfterTransaction_expense()
+QDEBUG : DatabaseTests::account_deleteTransaction_revertsBalance() Database path: "/tmp/LedgerAppTests-MORDPH/test_ledger.db"
+PASS   : DatabaseTests::account_deleteTransaction_revertsBalance()
+QDEBUG : DatabaseTests::tx_addTransaction_setsId() Database path: "/tmp/LedgerAppTests-GemepS/test_ledger.db"
+PASS   : DatabaseTests::tx_addTransaction_setsId()
+QDEBUG : DatabaseTests::tx_findTransactions_emptyFilter_returnsAll() Database path: "/tmp/LedgerAppTests-jaKTDG/test_ledger.db"
+PASS   : DatabaseTests::tx_findTransactions_emptyFilter_returnsAll()
+QDEBUG : DatabaseTests::tx_findTransactions_filterByType_incomeOnly() Database path: "/tmp/LedgerAppTests-uzynee/test_ledger.db"
+PASS   : DatabaseTests::tx_findTransactions_filterByType_incomeOnly()
+QDEBUG : DatabaseTests::tx_findTransactions_filterByAccountId() Database path: "/tmp/LedgerAppTests-JCDrAV/test_ledger.db"
+PASS   : DatabaseTests::tx_findTransactions_filterByAccountId()
+QDEBUG : DatabaseTests::tx_findTransactions_invalidFilter_returnsEmpty() Database path: "/tmp/LedgerAppTests-cLbiZW/test_ledger.db"
+QSYSTEM: DatabaseTests::tx_findTransactions_invalidFilter_returnsEmpty() Failed to find transactions: "no such column: THIS_IS_NOT_VALID_SQL Unable to execute statement"
+PASS   : DatabaseTests::tx_findTransactions_invalidFilter_returnsEmpty()
+QDEBUG : DatabaseTests::tx_deleteTransaction_nonexistent_fails() Database path: "/tmp/LedgerAppTests-wAfGfi/test_ledger.db"
+QSYSTEM: DatabaseTests::tx_deleteTransaction_nonexistent_fails() Failed to retrieve transaction for deletion: " "
+PASS   : DatabaseTests::tx_deleteTransaction_nonexistent_fails()
+QDEBUG : DatabaseTests::tx_addTransaction_transfer_noBalanceChange() Database path: "/tmp/LedgerAppTests-RCmlFw/test_ledger.db"
+PASS   : DatabaseTests::tx_addTransaction_transfer_noBalanceChange()
+QDEBUG : DatabaseTests::tx_addTransaction_unknownType_failsAndNoInsert() Database path: "/tmp/LedgerAppTests-qLVIeU/test_ledger.db"
+QSYSTEM: DatabaseTests::tx_addTransaction_unknownType_failsAndNoInsert() Unsupported transaction type: "WeirdType"
+PASS   : DatabaseTests::tx_addTransaction_unknownType_failsAndNoInsert()
+QDEBUG : DatabaseTests::tx_addTransaction_badAccount_rollsBackInsert() Database path: "/tmp/LedgerAppTests-rfXCBy/test_ledger.db"
+PASS   : DatabaseTests::tx_addTransaction_badAccount_rollsBackInsert()
+QDEBUG : DatabaseTests::tx_updateTransaction_adjustsBalance() Database path: "/tmp/LedgerAppTests-lPVAdY/test_ledger.db"
+PASS   : DatabaseTests::tx_updateTransaction_adjustsBalance()
+QDEBUG : DatabaseTests::tx_calculateSpent_empty_returns0() Database path: "/tmp/LedgerAppTests-ohiPOz/test_ledger.db"
+PASS   : DatabaseTests::tx_calculateSpent_empty_returns0()
+QDEBUG : DatabaseTests::tx_calculateSpent_onlyExpenseAndMonthCounted() Database path: "/tmp/LedgerAppTests-oaesRg/test_ledger.db"
+PASS   : DatabaseTests::tx_calculateSpent_onlyExpenseAndMonthCounted()
+QDEBUG : DatabaseTests::category_addCategory_duplicate_fails() Database path: "/tmp/LedgerAppTests-cUnwAG/test_ledger.db"
+QSYSTEM: DatabaseTests::category_addCategory_duplicate_fails() Failed to add category: "UNIQUE constraint failed: categories.name Unable to fetch row"
+PASS   : DatabaseTests::category_addCategory_duplicate_fails()
+QDEBUG : DatabaseTests::category_getAllCategories_filterType_returnsOnlyMatches() Database path: "/tmp/LedgerAppTests-UtESCi/test_ledger.db"
+PASS   : DatabaseTests::category_getAllCategories_filterType_returnsOnlyMatches()
+QDEBUG : DatabaseTests::budget_setAndGetBudget_roundTrip() Database path: "/tmp/LedgerAppTests-bzNiST/test_ledger.db"
+PASS   : DatabaseTests::budget_setAndGetBudget_roundTrip()
+QDEBUG : DatabaseTests::budget_getBudget_missing_returnsSentinel() Database path: "/tmp/LedgerAppTests-zLzvLa/test_ledger.db"
+PASS   : DatabaseTests::budget_getBudget_missing_returnsSentinel()
+QDEBUG : DatabaseTests::tx_findTransactions_sortedByTimeDesc() Database path: "/tmp/LedgerAppTests-oaopMT/test_ledger.db"
+PASS   : DatabaseTests::tx_findTransactions_sortedByTimeDesc()
+QDEBUG : DatabaseTests::it_endToEnd_budgetVsSpent() Database path: "/tmp/LedgerAppTests-QVmvqo/test_ledger.db"
+PASS   : DatabaseTests::it_endToEnd_budgetVsSpent()
+QDEBUG : DatabaseTests::it_endToEnd_multiAccountAndCategoryQueries() Database path: "/tmp/LedgerAppTests-ytvbcy/test_ledger.db"
+PASS   : DatabaseTests::it_endToEnd_multiAccountAndCategoryQueries()
+PASS   : DatabaseTests::cleanupTestCase()
+Totals: 35 passed, 0 failed, 0 skipped, 0 blacklisted, 2224ms
+********* Finished testing of DatabaseTests *********

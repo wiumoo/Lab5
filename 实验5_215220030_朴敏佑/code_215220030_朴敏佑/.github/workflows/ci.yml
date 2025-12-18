@@ -1,0 +1,59 @@
+name: C++ Qt Project CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2) 安装 Qt6（含 QtTest + QtSql + SQLite 驱动）
+      # 说明：aqtinstall 会从官方渠道下载对应的 Qt 组件，适合在 CI 上使用。
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.6.3"
+          host: "linux"
+          target: "desktop"
+          arch: "gcc_64"
+          modules: "qtsql"
+
+      # 3) 安装构建工具与覆盖率工具
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make g++ gcovr
+
+      # 4) 构建并运行单元测试（QtTest）
+      - name: Build & run QtTest
+        working-directory: Lab4/project/tests
+        run: |
+          mkdir -p build
+          cd build
+          qmake "CONFIG+=coverage" ../LedgerAppTests.pro
+          make -j2
+          QT_QPA_PLATFORM=offscreen ./LedgerAppTests -maxwarnings 0
+
+      # 5) 生成覆盖率报告（基于 gcov）
+      - name: Coverage (gcovr)
+        working-directory: Lab4/project/tests
+        run: |
+          cd build
+          gcovr -r ../.. --object-directory . \
+            --exclude "../../.qtcreator" --exclude "../build" \
+            --print-summary --xml-pretty -o ../coverage.xml
+
+      # 6) 上传覆盖率产物（便于下载查看，也方便截图）
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: Lab4/project/tests/coverage.xml

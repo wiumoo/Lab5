@@ -1,0 +1,6 @@
+total 20
+drwx------ 2 mininet mininet 4096 Dec 18 09:18 .
+drwxrwxr-x 5 mininet mininet 4096 Dec 18 09:19 ..
+-rw------- 1 mininet mininet    9 Dec 18 09:18 id:000000,sig:06,src:000000,time:351,op:ext_UI,pos:0
+-rw------- 1 mininet mininet    5 Dec 18 09:18 id:000001,sig:06,src:000000,time:429,op:havoc,rep:64
+-rw------- 1 mininet mininet  595 Dec 18 09:18 README.txt

@@ -1,0 +1,64 @@
+@startuml LedgerComponentDiagram
+title 记账本系统 - 组件图：模块划分与依赖（Req001-Req008）
+' 记账本系统 - 组件图（结构性图）
+skinparam componentStyle rectangle
+skinparam linetype ortho
+skinparam Shadowing false
+
+node "Mobile Device" {
+  [Ledger App UI]
+  [Chart Module]
+  [Local Data Layer]
+  [Security Module]
+  [Notification Module]
+  [Backup Module]
+}
+
+cloud "Cloud Providers" {
+  [iCloud]
+  [Google Drive]
+}
+
+database "LocalDB (SQLite/Realm)" as LocalDB
+
+[Ledger App UI] -down-> [Local Data Layer] : CRUD Transactions/Accounts/Categories
+[Ledger App UI] -down-> [Chart Module] : Query stats (pie/line)
+[Ledger App UI] -down-> [Backup Module] : Export/Backup/Restore
+[Ledger App UI] -down-> [Notification Module] : Subscribe budget alerts
+[Ledger App UI] -down-> [Security Module] : App lock (PIN/Biometrics)
+
+[Local Data Layer] --> LocalDB : Encrypted storage
+[Security Module] ..> [Local Data Layer] : encrypt/decrypt
+
+[Backup Module] ..> [Security Module] : encrypt export
+[Backup Module] --> [iCloud]
+[Backup Module] --> [Google Drive]
+
+[Chart Module] ..> [Local Data Layer] : aggregate
+[Notification Module] ..> [Local Data Layer] : budget usage
+
+note right of [Ledger App UI]
+Tabs: 首页/记账/统计/我的 (Req007)
+end note
+
+note bottom of [Local Data Layer]
+Repos: Transaction/Account/Category/Budget/Receipt (Req001-003,005-006)
+end note
+
+note bottom of [Chart Module]
+饼图分类占比(Req004) 折线趋势(Req004)
+end note
+
+note bottom of [Notification Module]
+预算80%提醒(Req005)
+end note
+
+note bottom of [Backup Module]
+备份/恢复/导出CSV/Excel; iCloud/Google Drive (Req008)
+end note
+
+note bottom of [Security Module]
+本地加密、指纹/面容/密码锁定、隐藏敏感信息 (Req008)
+end note
+
+@enduml

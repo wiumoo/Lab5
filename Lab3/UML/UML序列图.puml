@@ -1,0 +1,33 @@
+@startuml RecordExpenseSequence
+' 可视化标题，便于导出到PNG时显示
+title 记账本系统 - 序列图：记录支出并预算检查（Req001, Req003, Req005）
+' 记账本系统 - 序列图（交互性图）: 记录支出并预算检查
+
+actor User
+participant UI as "LedgerAppUI"
+participant TxService as "TransactionService"
+participant AccRepo as "AccountRepository"
+participant TxRepo as "TransactionRepository"
+participant BudgetSvc as "BudgetService"
+participant BudgetRepo as "BudgetRepository"
+participant Notif as "NotificationService"
+
+User -> UI : 输入金额/分类/账户/备注/凭证
+UI -> TxService : addTransaction(input)
+TxService -> TxRepo : save(tx)
+TxRepo --> TxService : tx(saved)
+TxService -> AccRepo : updateBalance(accountId, -amount)
+AccRepo --> TxService : ok
+TxService -> BudgetSvc : checkThreshold(catId, month)
+BudgetSvc -> BudgetRepo : find(catId, month)
+BudgetRepo --> BudgetSvc : budget
+BudgetSvc -> TxRepo : calc spent for cat/month
+TxRepo --> BudgetSvc : sum(spent)
+BudgetSvc --> TxService : ThresholdResult(hit, percent)
+alt >=80% 预算提醒
+  TxService -> Notif : notifyBudgetWarning(category, usage)
+  Notif --> TxService : ok
+end
+TxService --> UI : Transaction
+UI --> User : 展示保存成功状态
+@enduml

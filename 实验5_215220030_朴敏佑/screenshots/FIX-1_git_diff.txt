@@ -1,0 +1,133 @@
+Not a git repository; fallback excerpts:
+
+--- database.cpp excerpt (transaction-related) ---
+52:    // connection are destroyed before removeDatabase() is called.
+56:        QSqlDatabase::removeDatabase(connectionName);
+139:bool Database::addTransaction(Transaction &tx)
+170:    if (!updateBalance(tx.accountId, delta)) {
+176:        qCritical() << "Failed to commit addTransaction:" << db.lastError().text();
+183:bool Database::deleteTransaction(int id)
+215:        if(updateBalance(accountId, -deltaApplied)) {
+226:bool Database::updateTransaction(const Transaction &tx)
+275:        if (!updateBalance(oldAccountId, newDelta - oldDelta)) {
+280:        if (!updateBalance(oldAccountId, -oldDelta)) {
+284:        if (!updateBalance(tx.accountId, newDelta)) {
+291:        qCritical() << "Failed to commit updateTransaction:" << db.lastError().text();
+395:bool Database::updateBalance(int accountId, double amount)
+
+--- tst_database.cpp excerpt (new tests) ---
+18:    void account_addAccount_setsId();
+19:    void account_addAccount_duplicateName_fails();
+20:    void account_getAllAccounts_returnsInserted();
+21:    void account_updateAccount_updatesFields();
+22:    void account_updateAccount_duplicateName_fails();
+23:    void account_updateBalance_increases();
+24:    void account_updateBalance_decreases();
+25:    void account_updateBalance_nonexistentId_fails();
+26:    void account_updateBalance_withoutInit_fails();
+27:    void account_balance_matchesAfterTransaction_income();
+28:    void account_balance_matchesAfterTransaction_expense();
+29:    void account_deleteTransaction_revertsBalance();
+32:    void tx_addTransaction_setsId();
+33:    void tx_findTransactions_emptyFilter_returnsAll();
+34:    void tx_findTransactions_filterByType_incomeOnly();
+35:    void tx_findTransactions_filterByAccountId();
+36:    void tx_findTransactions_invalidFilter_returnsEmpty();
+37:    void tx_deleteTransaction_nonexistent_fails();
+38:    void tx_addTransaction_transfer_noBalanceChange();
+39:    void tx_addTransaction_unknownType_failsAndNoInsert();
+40:    void tx_addTransaction_badAccount_rollsBackInsert();
+41:    void tx_updateTransaction_adjustsBalance();
+42:    void tx_calculateSpent_empty_returns0();
+43:    void tx_calculateSpent_onlyExpenseAndMonthCounted();
+48:    void tx_findTransactions_sortedByTimeDesc();
+51:    void it_endToEnd_budgetVsSpent();
+52:    void it_endToEnd_multiAccountAndCategoryQueries();
+129:void DatabaseTests::account_addAccount_setsId() {
+136:void DatabaseTests::account_addAccount_duplicateName_fails() {
+145:void DatabaseTests::account_getAllAccounts_returnsInserted() {
+161:void DatabaseTests::account_updateAccount_updatesFields() {
+178:void DatabaseTests::account_updateAccount_duplicateName_fails() {
+189:void DatabaseTests::account_updateBalance_increases() {
+199:void DatabaseTests::account_updateBalance_decreases() {
+209:void DatabaseTests::account_updateBalance_nonexistentId_fails() {
+215:void DatabaseTests::account_updateBalance_withoutInit_fails() {
+220:void DatabaseTests::account_balance_matchesAfterTransaction_income() {
+235:void DatabaseTests::account_balance_matchesAfterTransaction_expense() {
+250:void DatabaseTests::account_deleteTransaction_revertsBalance() {
+268:void DatabaseTests::tx_addTransaction_setsId() {
+280:void DatabaseTests::tx_findTransactions_emptyFilter_returnsAll() {
+296:void DatabaseTests::tx_findTransactions_filterByType_incomeOnly() {
+316:void DatabaseTests::tx_findTransactions_filterByAccountId() {
+336:void DatabaseTests::tx_findTransactions_invalidFilter_returnsEmpty() {
+342:void DatabaseTests::tx_deleteTransaction_nonexistent_fails() {
+347:void DatabaseTests::tx_addTransaction_transfer_noBalanceChange() {
+363:void DatabaseTests::tx_addTransaction_unknownType_failsAndNoInsert() {
+376:void DatabaseTests::tx_addTransaction_badAccount_rollsBackInsert() {
+386:void DatabaseTests::tx_updateTransaction_adjustsBalance() {
+403:void DatabaseTests::tx_calculateSpent_empty_returns0() {
+408:void DatabaseTests::tx_calculateSpent_onlyExpenseAndMonthCounted() {
+485:void DatabaseTests::tx_findTransactions_sortedByTimeDesc() {
+504:void DatabaseTests::it_endToEnd_budgetVsSpent() {
+532:void DatabaseTests::it_endToEnd_multiAccountAndCategoryQueries() {
+
+--- ci.yml ---
+name: C++ Qt Project CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2) 安装 Qt6（含 QtTest + QtSql + SQLite 驱动）
+      # 说明：aqtinstall 会从官方渠道下载对应的 Qt 组件，适合在 CI 上使用。
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.6.3"
+          host: "linux"
+          target: "desktop"
+          arch: "gcc_64"
+          modules: "qtsql"
+
+      # 3) 安装构建工具与覆盖率工具
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make g++ gcovr
+
+      # 4) 构建并运行单元测试（QtTest）
+      - name: Build & run QtTest
+        working-directory: Lab4/project/tests
+        run: |
+          mkdir -p build
+          cd build
+          qmake "CONFIG+=coverage" ../LedgerAppTests.pro
+          make -j2
+          QT_QPA_PLATFORM=offscreen ./LedgerAppTests -maxwarnings 0
+
+      # 5) 生成覆盖率报告（基于 gcov）
+      - name: Coverage (gcovr)
+        working-directory: Lab4/project/tests
+        run: |
+          cd build
+          gcovr -r ../.. --object-directory . \
+            --exclude "../../.qtcreator" --exclude "../build" \
+            --print-summary --xml-pretty -o ../coverage.xml
+
+      # 6) 上传覆盖率产物（便于下载查看，也方便截图）
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: Lab4/project/tests/coverage.xml

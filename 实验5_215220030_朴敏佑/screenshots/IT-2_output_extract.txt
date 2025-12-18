@@ -1,0 +1,8 @@
+]633;E;echo "# Extracted from UT-2_terminal_output.txt";d853d5db-3f47-4a38-a21b-0502957d0540]633;C# Extracted from UT-2_terminal_output.txt
+
+74:QDEBUG : DatabaseTests::it_endToEnd_budgetVsSpent() Database path: "/tmp/LedgerAppTests-QVmvqo/test_ledger.db"
+75:PASS   : DatabaseTests::it_endToEnd_budgetVsSpent()
+76:QDEBUG : DatabaseTests::it_endToEnd_multiAccountAndCategoryQueries() Database path: "/tmp/LedgerAppTests-ytvbcy/test_ledger.db"
+77:PASS   : DatabaseTests::it_endToEnd_multiAccountAndCategoryQueries()
+
+79:Totals: 35 passed, 0 failed, 0 skipped, 0 blacklisted, 2224ms

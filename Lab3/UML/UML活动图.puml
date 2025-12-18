@@ -1,0 +1,38 @@
+@startuml AddTransactionActivity
+title 记账本系统 - 活动图：添加交易流程（Req001, Req003, Req005）
+' 记账本系统 - 活动图（行为性图）: 添加交易流程
+skinparam shadowing false
+skinparam linetype ortho
+
+start
+:打开记账页面;
+:输入金额 (支持加减乘除);
+if (选择类型?) then (收入)
+  :选择收入分类;
+else (支出)
+  :选择支出分类;
+endif
+:选择账户;
+:填写时间与备注;
+if (是否添加凭证照片?) then (是)
+  :拍照/选择相册 -> 生成Receipt;
+else (否)
+endif
+:提交保存;
+
+fork
+  :写入Transaction;
+  :更新账户余额(+/-);
+end fork
+
+if (类型==支出 且存在预算?) then (是)
+  :计算当月该分类已支出;
+  if (已支出/预算 >= 80% ?) then (达到)
+    :发送预算提醒通知;
+  else (未达)
+  endif
+else (否)
+endif
+
+stop
+@enduml

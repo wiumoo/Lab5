@@ -1,0 +1,23 @@
+{
+    "1": {
+        "CWE": "CWE-401",
+        "name": "Memory Leak",
+        "File": "project/flaw_demo.cpp",
+        "Line": "11",
+        "At": "Function ends without freeing 'ptr'"
+    },
+    "2": {
+        "CWE": "CWE-415",
+        "name": "Double Free",
+        "File": "project/flaw_demo.cpp",
+        "Line": "22",
+        "At": "free(ptr);"
+    },
+    "3": {
+        "CWE": "CWE-476",
+        "name": "NULL Pointer Dereference",
+        "File": "project/flaw_demo.cpp",
+        "Line": "35",
+        "At": "printf(\"Value: %d\\n\", *ptr);"
+    }
+}

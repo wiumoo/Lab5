@@ -1,0 +1,16 @@
+{
+    "1": {
+        "CWE": "CWE-561",
+        "name": "DeadCode",
+        "File": "project/flaw_demo.cpp",
+        "Line": "30",
+        "At": "if (1 > 2) {"
+    },
+    "2": {
+        "CWE": "CWE-1098",
+        "name": "style-unusedFunction",
+        "File": "project/mainwindow.cpp",
+        "Line": "45",
+        "At": "void MainWindow::setupUiElements()"
+    }
+}

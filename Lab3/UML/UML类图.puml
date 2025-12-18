@@ -1,0 +1,252 @@
+@startuml LedgerClassDiagram
+title 记账本系统 - 类图（核心领域与应用层，Req001-Req008）
+' 记账本系统 - 类图
+' 依据需求 Req001-Req008
+' 包结构：ui、application、domain、infrastructure
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam Shadowing false
+'' removed linetype for compatibility
+
+package "ui" {
+  class LedgerAppUI <<UI>> {
+    +addTransaction()
+    +editTransaction()
+    +search()
+    +viewDashboard()
+  }
+}
+
+package "application" {
+  interface ITransactionService {
+    +addTransaction(tx: TransactionInput): Transaction
+    +editTransaction(id: UUID, patch: TransactionPatch): Transaction
+    +deleteTransaction(id: UUID)
+    +search(criteria: FilterCriteria): List<Transaction>
+  }
+  class TransactionService
+
+  interface IAccountService {
+    +createAccount(input: AccountInput): Account
+    +transfer(input: TransferInput): Transfer
+    +getBalance(id: UUID): Money
+  }
+  class AccountService
+
+  interface IBudgetService {
+    +setBudget(input: BudgetInput): Budget
+    +getUsage(catId: UUID, period: Month): BudgetUsage
+    +checkThreshold(catId: UUID, period: Month): ThresholdResult
+  }
+  class BudgetService
+
+  interface IBackupService {
+    +exportCSV(range: DateRange): File
+    +exportExcel(range: DateRange): File
+    +backup(provider: CloudProvider)
+    +restore(source: BackupSource)
+  }
+  class BackupService
+
+  interface INotificationService {
+    +notifyBudgetWarning(cat: Category, usage: BudgetUsage)
+  }
+  class NotificationService
+}
+
+package "domain" {
+  class Transaction {
+    +id: UUID
+    +amount: Money
+    +type: TxType
+    +categoryId: UUID
+    +accountId: UUID
+    +time: DateTime
+    +note: String
+    +receiptId: UUID
+  }
+  enum TxType {
+    Income
+    Expense
+    Transfer
+  }
+
+  class Account {
+    +id: UUID
+    +name: String
+    +type: AccountType
+    +balance: Money
+  }
+  enum AccountType {
+    Cash
+    Bank
+    CreditCard
+    Alipay
+    WeChat
+  }
+
+  class Category {
+    +id: UUID
+    +name: String
+    +icon: String
+    +color: String
+    +kind: CatKind
+    +order: int
+  }
+  enum CatKind {
+    Income
+    Expense
+  }
+
+  class Budget {
+    +id: UUID
+    +categoryId: UUID
+    +month: Month
+    +limit: Money
+  }
+
+  class Receipt {
+    +id: UUID
+    +uri: String
+  }
+
+  class FilterCriteria {
+    +from: DateTime
+    +to: DateTime
+    +type: TxType
+  +categoryIds: List~UUID~
+  +accountIds: List~UUID~
+    +minAmount: Money
+    +maxAmount: Money
+    +keyword: String
+  }
+
+  class Transfer {
+    +id: UUID
+    +fromAccountId: UUID
+    +toAccountId: UUID
+    +amount: Money
+    +time: DateTime
+    +note: String
+  }
+
+  class BudgetUsage {
+    +categoryId: UUID
+    +month: Month
+    +spent: Money
+    +limit: Money
+    +rate(): float
+  }
+
+  class ThresholdResult {
+    +hit: boolean
+    +percent: float
+  }
+}
+
+package "infrastructure" {
+  interface TransactionRepository {
+    +save(tx: Transaction): Transaction
+    +findById(id: UUID): Transaction
+    +deleteById(id: UUID)
+  +search(criteria: FilterCriteria): List~Transaction~
+  }
+  interface AccountRepository {
+    +save(acc: Account): Account
+    +findById(id: UUID): Account
+    +updateBalance(id: UUID, delta: Money)
+  }
+  interface CategoryRepository {
+    +save(cat: Category): Category
+  +findAll(): List~Category~
+    +findById(id: UUID): Category
+  }
+  interface BudgetRepository {
+    +save(budget: Budget): Budget
+    +find(catId: UUID, month: Month): Budget
+  }
+  interface ReceiptStorage {
+    +save(receipt: Receipt): Receipt
+    +get(id: UUID): Receipt
+  }
+  interface CryptoStore {
+    +encrypt(data: bytes): bytes
+    +decrypt(data: bytes): bytes
+  }
+  interface CloudBackupProvider {
+    +backup(file: File)
+    +restore(): File
+  }
+  class LocalDB <<DB>>
+  class ChartEngine <<Chart>>
+}
+
+' Relationships
+TransactionService ..|> ITransactionService
+AccountService ..|> IAccountService
+BudgetService ..|> IBudgetService
+BackupService ..|> IBackupService
+NotificationService ..|> INotificationService
+LedgerAppUI --> ITransactionService : add/edit/search
+LedgerAppUI --> IAccountService : transfer/balance
+LedgerAppUI --> IBudgetService : budgets
+LedgerAppUI --> IBackupService : export/backup/restore
+LedgerAppUI --> INotificationService : subscribe
+
+TransactionService --> TransactionRepository
+TransactionService --> AccountRepository : update balance
+TransactionService --> ReceiptStorage
+TransactionService --> IBudgetService : checkThreshold
+TransactionService --> CategoryRepository
+
+AccountService --> AccountRepository
+AccountService --> TransactionRepository : record transfer
+
+BudgetService --> BudgetRepository
+BudgetService --> TransactionRepository : calc spent
+BudgetService --> INotificationService : warn >=80%
+
+BackupService --> CloudBackupProvider
+BackupService --> CryptoStore
+BackupService --> TransactionRepository
+BackupService --> AccountRepository
+BackupService --> CategoryRepository
+BackupService --> BudgetRepository
+
+ChartEngine ..> TransactionRepository : stats
+LocalDB <.. TransactionRepository
+LocalDB <.. AccountRepository
+LocalDB <.. CategoryRepository
+LocalDB <.. BudgetRepository
+
+' Notes mapping requirements
+note top of Transaction
+Req001: 金额/类型/分类/时间/备注/凭证；支持编辑删除
+end note
+
+note top of Category
+Req002: 预设+自定义；名称/图标/颜色/排序
+end note
+
+note top of Account
+Req003: 多账户、余额自动更新、转账
+end note
+
+note top of Budget
+Req005: 月度预算、80%提醒
+end note
+
+note top of FilterCriteria
+Req006: 多条件组合筛选+关键词+排序
+end note
+
+note top of BackupService
+Req008: 备份/恢复/导出、加密
+end note
+
+note top of ChartEngine
+Req004: 饼图分类占比、折线趋势
+end note
+
+@enduml

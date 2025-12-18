@@ -1,0 +1,16 @@
+{
+    "1": {
+        "CWE": "CWE-120",
+        "name": "Buffer Overflow Risk",
+        "File": "project/flaw_demo.cpp",
+        "Line": "9",
+        "At": "strcpy(ptr, \"This is a memory leak example.\");"
+    },
+    "2": {
+        "CWE": "CWE-20",
+        "name": "Missing Input Validation",
+        "File": "project/database.cpp",
+        "Line": "85",
+        "At": "query.bindValue(\":amount\", tx.amount);"
+    }
+}

@@ -1,0 +1,14 @@
+# CI-2（GitHub Actions 全绿）截图说明
+
+目的：证明 CI 在 GitHub Actions 上自动运行并且全部通过。
+
+截图内容要求（建议一张图包含尽量多信息）：
+1) 仓库 Actions 页面里，最近一次 workflow run 的绿色对勾（success）。
+2) 点击进入该 run 后，左侧/中间的 Jobs 列表均为绿色（至少能看到 build-and-test 成功）。
+3) 最好能看到触发来源（push / pull_request）与 commit 信息。
+
+操作步骤：
+- 打开 GitHub 仓库网页 -> Actions
+- 选择工作流 "C++ Qt Project CI" 的最新一次 run
+- 进入 run 详情页，确认所有步骤绿色
+- 截图保存为：screenshots/CI-2.png

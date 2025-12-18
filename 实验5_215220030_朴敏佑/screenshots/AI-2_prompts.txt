@@ -1,0 +1,17 @@
+# AI-2 / AI-3 截图用 Prompts（复制到 Copilot Chat）
+
+Prompt-1：
+请根据 Lab4/project/tests/tst_database.cpp 的失败/边界用例，定位 Lab4/project/database.cpp 中余额更新与交易更新的逻辑缺陷，并给出“最小改动”的修复方案（要求：事务一致性、错误返回语义正确）。
+
+Prompt-2：
+如何保证 addTransaction/deleteTransaction/updateTransaction 与余额更新的原子一致？请给出使用 QtSql 的事务（transaction/commit/rollback）实现思路，并说明失败场景如何回滚。
+
+Prompt-3：
+如何把上面的修复点转化为可复现的单元测试用例，并说明哪些测试能覆盖关键分支？如果需要，给出建议的测试用例名称与断言点。
+
+截图建议：
+- AI-2：截图“你发送的 Prompt”（能看到 Prompt 文本和时间/对话上下文）
+- AI-3：截图“Copilot 给出的修复建议回复”（能看到建议内容）
+保存文件名：
+- screenshots/AI-2.png
+- screenshots/AI-3.png

@@ -1,0 +1,49 @@
+=================================================================
+==96821==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x602000000019 at pc 0x000000481c5c bp 0x7ffc659617b0 sp 0x7ffc65960f70
+READ of size 10 at 0x602000000019 thread T0
+    #0 0x481c5b in strcpy (/home/mininet/Lab5/Lab4/project/fuzz/fuzz_notes_parser+0x481c5b)
+    #1 0x4c8748 in parse_note(unsigned char const*, unsigned long) /home/mininet/Lab5/Lab4/project/fuzz/fuzz_notes_parser.cpp:44:9
+    #2 0x4c8748 in main /home/mininet/Lab5/Lab4/project/fuzz/fuzz_notes_parser.cpp:77:11
+    #3 0x7fce5eba2082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #4 0x41e38d in _start (/home/mininet/Lab5/Lab4/project/fuzz/fuzz_notes_parser+0x41e38d)
+
+0x602000000019 is located 0 bytes to the right of 9-byte region [0x602000000010,0x602000000019)
+allocated by thread T0 here:
+    #0 0x49628d in malloc (/home/mininet/Lab5/Lab4/project/fuzz/fuzz_notes_parser+0x49628d)
+    #1 0x4c8477 in main /home/mininet/Lab5/Lab4/project/fuzz/fuzz_notes_parser.cpp:68:31
+    #2 0x7fce5eba2082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+
+SUMMARY: AddressSanitizer: heap-buffer-overflow (/home/mininet/Lab5/Lab4/project/fuzz/fuzz_notes_parser+0x481c5b) in strcpy
+Shadow bytes around the buggy address:
+  0x0c047fff7fb0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0c047fff7fc0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0c047fff7fd0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0c047fff7fe0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0c047fff7ff0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x0c047fff8000: fa fa 00[01]fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff8010: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff8020: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff8030: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff8040: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff8050: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+  Shadow gap:              cc
+==96821==ABORTING

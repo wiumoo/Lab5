@@ -1,0 +1,23 @@
+{
+    "1": {
+        "CWE": "CWE-401",
+        "name": "MemoryLeak",
+        "File": "project/flaw_demo.cpp",
+        "Line": "11",
+        "At": "}"
+    },
+    "2": {
+        "CWE": "CWE-415",
+        "name": "DoubleFree",
+        "File": "project/flaw_demo.cpp",
+        "Line": "22",
+        "At": "free(ptr); // 第二次释放"
+    },
+    "3": {
+        "CWE": "CWE-476",
+        "name": "NullPointerDereference",
+        "File": "project/flaw_demo.cpp",
+        "Line": "35",
+        "At": "printf(\"Value: %d\\n\", *ptr);"
+    }
+}

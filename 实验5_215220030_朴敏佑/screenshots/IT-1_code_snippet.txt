@@ -1,0 +1,215 @@
+]633;E;echo "# it_endToEnd_* occurrences (line numbers)";d853d5db-3f47-4a38-a21b-0502957d0540]633;C# it_endToEnd_* occurrences (line numbers)
+51:    void it_endToEnd_budgetVsSpent();
+52:    void it_endToEnd_multiAccountAndCategoryQueries();
+504:void DatabaseTests::it_endToEnd_budgetVsSpent() {
+532:void DatabaseTests::it_endToEnd_multiAccountAndCategoryQueries() {
+
+# Context around it_endToEnd_* (±20 lines)
+\n---- context around line 51 ----
+    // -------- Unit tests: Transactions / Budgets / Spent (>=10) --------
+    void tx_addTransaction_setsId();
+    void tx_findTransactions_emptyFilter_returnsAll();
+    void tx_findTransactions_filterByType_incomeOnly();
+    void tx_findTransactions_filterByAccountId();
+    void tx_findTransactions_invalidFilter_returnsEmpty();
+    void tx_deleteTransaction_nonexistent_fails();
+    void tx_addTransaction_transfer_noBalanceChange();
+    void tx_addTransaction_unknownType_failsAndNoInsert();
+    void tx_addTransaction_badAccount_rollsBackInsert();
+    void tx_updateTransaction_adjustsBalance();
+    void tx_calculateSpent_empty_returns0();
+    void tx_calculateSpent_onlyExpenseAndMonthCounted();
+    void category_addCategory_duplicate_fails();
+    void category_getAllCategories_filterType_returnsOnlyMatches();
+    void budget_setAndGetBudget_roundTrip();
+    void budget_getBudget_missing_returnsSentinel();
+    void tx_findTransactions_sortedByTimeDesc();
+
+    // -------- Integration tests (>=2 groups) --------
+    void it_endToEnd_budgetVsSpent();
+    void it_endToEnd_multiAccountAndCategoryQueries();
+
+private:
+    struct TestEnv {
+        QTemporaryDir tempDir;
+        QString dbPath;
+        Database db;
+
+        TestEnv() : tempDir(), dbPath(), db(nullptr) {
+            QVERIFY2(tempDir.isValid(), "Failed to create temp dir");
+            dbPath = QDir(tempDir.path()).filePath("test_ledger.db");
+            QVERIFY2(db.init(dbPath), "Failed to init SQLite DB");
+        }
+    };
+
+    static Account makeAccount(const QString &name, const QString &type, double balance) {
+        Account acc;
+        acc.id = -1;
+        acc.name = name;
+        acc.type = type;
+        acc.balance = balance;
+        return acc;
+    }
+
+    static Category makeCategory(const QString &name, const QString &type) {
+        Category cat;
+        cat.id = -1;
+        cat.name = name;
+        cat.type = type;
+        return cat;
+\n---- context around line 52 ----
+    void tx_addTransaction_setsId();
+    void tx_findTransactions_emptyFilter_returnsAll();
+    void tx_findTransactions_filterByType_incomeOnly();
+    void tx_findTransactions_filterByAccountId();
+    void tx_findTransactions_invalidFilter_returnsEmpty();
+    void tx_deleteTransaction_nonexistent_fails();
+    void tx_addTransaction_transfer_noBalanceChange();
+    void tx_addTransaction_unknownType_failsAndNoInsert();
+    void tx_addTransaction_badAccount_rollsBackInsert();
+    void tx_updateTransaction_adjustsBalance();
+    void tx_calculateSpent_empty_returns0();
+    void tx_calculateSpent_onlyExpenseAndMonthCounted();
+    void category_addCategory_duplicate_fails();
+    void category_getAllCategories_filterType_returnsOnlyMatches();
+    void budget_setAndGetBudget_roundTrip();
+    void budget_getBudget_missing_returnsSentinel();
+    void tx_findTransactions_sortedByTimeDesc();
+
+    // -------- Integration tests (>=2 groups) --------
+    void it_endToEnd_budgetVsSpent();
+    void it_endToEnd_multiAccountAndCategoryQueries();
+
+private:
+    struct TestEnv {
+        QTemporaryDir tempDir;
+        QString dbPath;
+        Database db;
+
+        TestEnv() : tempDir(), dbPath(), db(nullptr) {
+            QVERIFY2(tempDir.isValid(), "Failed to create temp dir");
+            dbPath = QDir(tempDir.path()).filePath("test_ledger.db");
+            QVERIFY2(db.init(dbPath), "Failed to init SQLite DB");
+        }
+    };
+
+    static Account makeAccount(const QString &name, const QString &type, double balance) {
+        Account acc;
+        acc.id = -1;
+        acc.name = name;
+        acc.type = type;
+        acc.balance = balance;
+        return acc;
+    }
+
+    static Category makeCategory(const QString &name, const QString &type) {
+        Category cat;
+        cat.id = -1;
+        cat.name = name;
+        cat.type = type;
+        return cat;
+    }
+\n---- context around line 504 ----
+
+void DatabaseTests::tx_findTransactions_sortedByTimeDesc() {
+    TestEnv env;
+    Account acc = makeAccount("A", "Cash", 0.0);
+    QVERIFY(env.db.addAccount(acc));
+    Category cat = makeCategory("Food", "Expense");
+    QVERIFY(env.db.addCategory(cat));
+
+    Transaction oldTx = makeTx(1.0, "Expense", cat.id, acc.id, QDateTime::currentDateTimeUtc().addSecs(-100));
+    Transaction newTx = makeTx(2.0, "Expense", cat.id, acc.id, QDateTime::currentDateTimeUtc());
+    QVERIFY(env.db.addTransaction(oldTx));
+    QVERIFY(env.db.addTransaction(newTx));
+
+    const auto list = env.db.findTransactions(QString());
+    QCOMPARE(list.size(), 2);
+    QVERIFY(list[0].time >= list[1].time);
+}
+
+// -------------------- Integration tests --------------------
+
+void DatabaseTests::it_endToEnd_budgetVsSpent() {
+    TestEnv env;
+    Account acc = makeAccount("Main", "Cash", 0.0);
+    QVERIFY(env.db.addAccount(acc));
+
+    Category food = makeCategory("Food", "Expense");
+    QVERIFY(env.db.addCategory(food));
+
+    Budget b;
+    b.id = -1;
+    b.categoryId = food.id;
+    b.month = 202512;
+    b.limit = 50.0;
+    QVERIFY(env.db.setBudget(b));
+
+    const QDateTime dec02(QDate(2025, 12, 2), QTime(8, 0), Qt::UTC);
+    Transaction t1 = makeTx(10.0, "Expense", food.id, acc.id, dec02);
+    Transaction t2 = makeTx(15.0, "Expense", food.id, acc.id, dec02.addDays(1));
+    QVERIFY(env.db.addTransaction(t1));
+    QVERIFY(env.db.addTransaction(t2));
+
+    const double spent = env.db.calculateSpent(food.id, 202512);
+    QCOMPARE(spent, 25.0);
+
+    const Budget loaded = env.db.getBudget(food.id, 202512);
+    QVERIFY(loaded.limit >= spent);
+}
+
+void DatabaseTests::it_endToEnd_multiAccountAndCategoryQueries() {
+    TestEnv env;
+
+\n---- context around line 532 ----
+    Budget b;
+    b.id = -1;
+    b.categoryId = food.id;
+    b.month = 202512;
+    b.limit = 50.0;
+    QVERIFY(env.db.setBudget(b));
+
+    const QDateTime dec02(QDate(2025, 12, 2), QTime(8, 0), Qt::UTC);
+    Transaction t1 = makeTx(10.0, "Expense", food.id, acc.id, dec02);
+    Transaction t2 = makeTx(15.0, "Expense", food.id, acc.id, dec02.addDays(1));
+    QVERIFY(env.db.addTransaction(t1));
+    QVERIFY(env.db.addTransaction(t2));
+
+    const double spent = env.db.calculateSpent(food.id, 202512);
+    QCOMPARE(spent, 25.0);
+
+    const Budget loaded = env.db.getBudget(food.id, 202512);
+    QVERIFY(loaded.limit >= spent);
+}
+
+void DatabaseTests::it_endToEnd_multiAccountAndCategoryQueries() {
+    TestEnv env;
+
+    Account cash = makeAccount("Cash", "Cash", 0.0);
+    Account bank = makeAccount("Bank", "Bank", 0.0);
+    QVERIFY(env.db.addAccount(cash));
+    QVERIFY(env.db.addAccount(bank));
+
+    Category salary = makeCategory("Salary", "Income");
+    Category food = makeCategory("Food", "Expense");
+    QVERIFY(env.db.addCategory(salary));
+    QVERIFY(env.db.addCategory(food));
+
+    const QDateTime now = QDateTime::currentDateTimeUtc();
+    Transaction s1 = makeTx(100.0, "Income", salary.id, bank.id, now.addSecs(-10));
+    Transaction e1 = makeTx(20.0, "Expense", food.id, cash.id, now.addSecs(-5));
+    Transaction e2 = makeTx(5.0, "Expense", food.id, cash.id, now);
+
+    QVERIFY(env.db.addTransaction(s1));
+    QVERIFY(env.db.addTransaction(e1));
+    QVERIFY(env.db.addTransaction(e2));
+
+    const auto expenses = env.db.findTransactions("type = 'Expense'");
+    QCOMPARE(expenses.size(), 2);
+
+    const auto cashOnly = env.db.findTransactions(QString("accountId = %1").arg(cash.id));
+    QCOMPARE(cashOnly.size(), 2);
+}
+
+QTEST_MAIN(DatabaseTests)
+#include "tst_database.moc"

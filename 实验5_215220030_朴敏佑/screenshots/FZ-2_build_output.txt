@@ -1,0 +1,5 @@
++ cd /home/mininet/Lab5/Lab4/project/fuzz
++ AFL_USE_ASAN=1
++ AFL_USE_UBSAN=1
++ afl-clang-fast++ -O0 -g -fno-omit-frame-pointer -DENABLE_CRASH_DEMO fuzz_notes_parser.cpp -o fuzz_notes_parser
+[1;92m[+] [0mInstrumented 17 locations (ASAN/MSAN mode, ratio 100%).[0m

@@ -1,0 +1,37 @@
+@startuml LedgerUseCase
+title 记账本系统 - 用例图（用户视角，Req001-Req008）
+
+actor 用户 as User
+
+rectangle 系统 {
+  usecase "记录交易(收入/支出)" as UC_Record <<Req001>>
+  usecase "编辑/删除交易" as UC_Edit <<Req001>>
+  usecase "分类管理(预设+自定义)" as UC_Cat <<Req002>>
+  usecase "多账户管理" as UC_Acct <<Req003>>
+  usecase "账户间转账" as UC_Transfer <<Req003>>
+  usecase "统计分析(饼图/折线)" as UC_Stats <<Req004>>
+  usecase "设置分类预算与提醒" as UC_Budget <<Req005>>
+  usecase "查询与筛选" as UC_Search <<Req006>>
+  usecase "数据导出(CSV/Excel)" as UC_Export <<Req008>>
+  usecase "备份/恢复(本地/云)" as UC_Backup <<Req008>>
+  usecase "安全与解锁(加密/指纹)" as UC_Security <<Req008>>
+}
+
+User --> UC_Record
+User --> UC_Edit
+User --> UC_Cat
+User --> UC_Acct
+User --> UC_Transfer
+User --> UC_Stats
+User --> UC_Budget
+User --> UC_Search
+User --> UC_Export
+User --> UC_Backup
+User --> UC_Security
+
+UC_Record .> UC_Cat : <<include>>
+UC_Record .> UC_Acct : <<include>>
+UC_Stats .> UC_Search : <<include>>
+UC_Budget .> UC_Stats : <<extend>>
+
+@enduml

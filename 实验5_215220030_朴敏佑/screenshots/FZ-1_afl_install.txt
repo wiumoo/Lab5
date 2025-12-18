@@ -1,0 +1,59 @@
+]633;E;echo "# afl-fuzz version";d853d5db-3f47-4a38-a21b-0502957d0540]633;C# afl-fuzz version
+[0;36mafl-fuzz++2.59d[0m based on afl by Michal Zalewski and a big online community
+
+afl-fuzz [ options ] -- /path/to/fuzzed_app [ ... ]
+
+Required parameters:
+  -i dir        - input directory with test cases
+  -o dir        - output directory for fuzzer findings
+
+Execution control settings:
+  -p schedule   - power schedules recompute a seed's performance score.
+                  <explore (default), fast, coe, lin, quad, or exploit>
+                  see docs/power_schedules.txt
+  -f file       - location read by the fuzzed program (stdin)
+  -t msec       - timeout for each run (auto-scaled, 50-1000 ms)
+  -m megs       - memory limit for child process (50 MB)
+  -Q            - use binary-only instrumentation (QEMU mode)
+  -U            - use unicorn-based instrumentation (Unicorn mode)
+  -W            - use qemu-based instrumentation with Wine (Wine mode)
+
+Mutator settings:
+  -R[R]         - add Radamsa as mutator, add another -R to exclusivly run it
+  -L minutes    - use MOpt(imize) mode and set the limit time for entering the
+                  pacemaker mode (minutes of no new paths, 0 = immediately).
+                  a recommended value is 10-60. see docs/README.MOpt
+
+Fuzzing behavior settings:
+  -N            - do not unlink the fuzzing input file
+  -d            - quick & dirty mode (skips deterministic steps)
+  -n            - fuzz without instrumentation (dumb mode)
+  -x dir        - optional fuzzer dictionary (see README, its really good!)
+
+Testing settings:
+  -s seed       - use a fixed seed for the RNG
+  -V seconds    - fuzz for a maximum total time of seconds then terminate
+  -E execs      - fuzz for a maximum number of total executions then terminate
+  Note: -V/-E are not precise, they are checked after a queue entry is done
+  which can be many minutes/execs later
+
+Other stuff:
+  -T text       - text banner to show on the screen
+  -M / -S id    - distributed mode (see parallel_fuzzing.txt)
+  -I command    - execute this command/script when a new crash is found
+  -B bitmap.txt - mutate a specific test case, use the out/fuzz_bitmap file
+  -C            - crash exploration mode (the peruvian rabbit thing)
+  -e ext        - File extension for the temporarily generated test case
+
+For additional tips, please consult /usr/share/doc/afl++-doc/README
+
+[0;36mafl-fuzz++2.59d[0m based on afl by Michal Zalewski and a big online community
+
+afl-fuzz [ options ] -- /path/to/fuzzed_app [ ... ]
+
+Required parameters:
+
+# dpkg package listing (afl)
+ii  afl++                                2.60c-1build2                     amd64        instrumentation-driven fuzzer for binary formats
+ii  afl++-clang                          2.60c-1build2                     amd64        instrumentation-driven fuzzer for binary formats - clang support
+ii  afl++-doc                            2.60c-1build2                     all          instrumentation-driven fuzzer for binary formats - documentation

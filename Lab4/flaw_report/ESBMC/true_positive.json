@@ -1,0 +1,23 @@
+{
+    "1": {
+        "CWE": "CWE-401",
+        "name": "memory leak",
+        "File": "project/flaw_demo.cpp",
+        "Line": "11",
+        "At": "dereference failure: forgotten memory"
+    },
+    "2": {
+        "CWE": "CWE-415",
+        "name": "double free",
+        "File": "project/flaw_demo.cpp",
+        "Line": "22",
+        "At": "dereference failure: double free"
+    },
+    "3": {
+        "CWE": "CWE-476",
+        "name": "null pointer dereference",
+        "File": "project/flaw_demo.cpp",
+        "Line": "35",
+        "At": "dereference failure: NULL pointer"
+    }
+}

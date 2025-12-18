@@ -1,0 +1,31 @@
+@startuml LedgerDeployment
+title 记账本系统 - 部署图（移动端、本地数据库、云备份）
+skinparam Shadowing false
+skinparam linetype ortho
+
+node "Mobile Device (iOS/Android)" as Mobile {
+  artifact "Ledger App" as App
+  artifact "Chart Module" as Chart
+  artifact "Local Data Layer" as DataLayer
+  artifact "Security Module" as Sec
+  artifact "Notification Module" as Notif
+}
+
+database "LocalDB (SQLite/Realm)" as LocalDB
+cloud "Cloud Providers" as Cloud {
+  node "iCloud" as iCloud
+  node "Google Drive" as GDrive
+}
+
+App --> DataLayer : CRUD
+App --> Chart : stats
+App --> Notif : subscribe
+App --> Sec : lock/auth
+
+DataLayer --> LocalDB : encrypted
+Sec ..> DataLayer : encrypt/decrypt
+
+App --> iCloud : backup/restore
+App --> GDrive : backup/restore
+
+@enduml
