@@ -47,7 +47,7 @@ jobs:
           cd build
           gcovr -r ../.. --object-directory . \
             --exclude "../../.qtcreator" --exclude "../build" \
-            --gcov-executable gcov-12 --gcov-parallel 1 \
+            --gcov-executable gcov-12 \
             --print-summary --xml-pretty -o ../coverage.xml
 
       # 5) 上传覆盖率产物（便于下载查看，也方便截图）
