@@ -22,6 +22,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             build-essential make gcovr \
+            gcc-12 g++-12 \
             qtbase5-dev qtbase5-dev-tools qt5-qmake qtchooser \
             qttools5-dev-tools \
             libqt5sql5-sqlite \
@@ -35,7 +36,7 @@ jobs:
           cd build
           export QT_SELECT=qt5
           echo "Using qmake: $(command -v qmake)"
-          qmake "CONFIG+=coverage" ../LedgerAppTests.pro
+          qmake "CONFIG+=coverage" "QMAKE_CC=gcc-12" "QMAKE_CXX=g++-12" ../LedgerAppTests.pro
           make -j2
           QT_QPA_PLATFORM=offscreen ./LedgerAppTests -maxwarnings 0
 
@@ -46,6 +47,7 @@ jobs:
           cd build
           gcovr -r ../.. --object-directory . \
             --exclude "../../.qtcreator" --exclude "../build" \
+            --gcov-executable gcov-12 --gcov-parallel 1 \
             --print-summary --xml-pretty -o ../coverage.xml
 
       # 5) 上传覆盖率产物（便于下载查看，也方便截图）
