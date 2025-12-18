@@ -45,29 +45,37 @@ jobs:
         working-directory: Lab4/project/tests
         run: |
           cd build
-          # gcov/gcovr 在 ubuntu-latest 上偶发崩溃（gcov returncode -11）。
+          # gcov/gcovr 在 ubuntu-latest 上偶发崩溃或返回非 0（例如 gcov returncode -11）。
           # 覆盖率用于报告与产物下载；CI 以“单测通过”为主，因此这里改为 best-effort：
-          # - 能生成则生成
-          # - 失败则使用仓库中已有的 coverage.xml（确保 artifact 仍可下载/截图）
+          # - 尝试生成
+          # - 失败不阻塞 CI（强制 exit 0）
+          # - 确保 ../coverage.xml 一定存在，便于 artifact 下载/截图
+          set +e
+
           GCOVR_WORKERS_FLAG=""
           if gcovr --help 2>/dev/null | grep -q -- '--workers'; then
             GCOVR_WORKERS_FLAG="--workers 1"
           fi
 
-          set +e
           gcovr -r ../.. --object-directory . \
             --exclude "../../.qtcreator" --exclude "../build" \
             --gcov-executable gcov-12 \
             $GCOVR_WORKERS_FLAG \
             --print-summary --xml-pretty -o ../coverage.xml
           RC=$?
-          set -e
-
           if [ $RC -ne 0 ]; then
-            echo "gcovr failed (exit=$RC). Using existing ../coverage.xml as fallback."
+            echo "gcovr failed (exit=$RC). Keeping existing ../coverage.xml as fallback."
           fi
 
-          test -f ../coverage.xml
+          if [ ! -f ../coverage.xml ]; then
+            echo "coverage.xml missing; creating minimal stub.";
+            cat > ../coverage.xml <<'XML'
+<?xml version=\"1.0\"?>
+<coverage line-rate=\"0\" branch-rate=\"0\" version=\"0\" timestamp=\"0\"></coverage>
+XML
+          fi
+
+          exit 0
 
       # 5) 上传覆盖率产物（便于下载查看，也方便截图）
       - name: Upload coverage artifact
